@@ -11,7 +11,7 @@ Dolby applies a per-speaker correction curve. This repo extracts that curve and 
 
 ```bash
 flatpak install flathub com.github.wwmm.easyeffects
-git clone https://github.com/USER/surface-book-2-linux-speakers.git
+git clone https://github.com/hopefulcoderx/surface-book-2-linux-speakers.git
 cd surface-book-2-linux-speakers
 ./install.sh
 ```
