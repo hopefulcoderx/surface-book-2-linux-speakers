@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Easy Effects (background)
+Comment=Speaker tuning: Surface Book 2 Dolby preset
+Exec=sh -c "sleep 8; flatpak run com.github.wwmm.easyeffects --service-mode --hide-window"
+Icon=com.github.wwmm.easyeffects
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
