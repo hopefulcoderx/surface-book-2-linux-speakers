@@ -14,8 +14,6 @@ MSI_URL = ("https://download.microsoft.com/download/9/4/f/94f7aed2-d3ed-4a60-ab9
 DAP_GUID = "f112024a-fe30-42a8-80ab-8dd825a06f78"
 AUDIO_OPTIMIZER = 18  # DAP parameter index holding per-band speaker gains
 AUDIO_REGULATOR = 22  # DAP parameter index holding per-band limit thresholds
-IEQ_TARGET = 13       # DAP parameter index holding the intelligent EQ target curve
-IEQ_AMOUNT = 12       # DAP parameter index holding the intelligent EQ strength (0-16)
 
 # Multiband compressor bands: (split frequency, Dolby band indices it covers).
 # Dolby bands: 47, 141, 234, 328, 469, 656, 844, 1031, 1313, 1688, 2250 ... Hz
@@ -100,36 +98,13 @@ def build_preset(params):
                "link-to-input": -80.01, "link-to-sidechain": -80.01,
                "sidechain-to-input": -80.01, "sidechain-to-link": -80.01}
     return {"output": {"blocklist": [],
-                       "plugins_order": ["equalizer#0", "equalizer#1",
-                                         "multiband_compressor#0", "limiter#0"],
+                       "plugins_order": ["equalizer#0", "multiband_compressor#0", "limiter#0"],
                        "equalizer#0": {"bypass": False, "input-gain": 0.0,
                                        "output-gain": 0.0, "mode": "IIR", "num-bands": n,
                                        "split-channels": True,
                                        "left": side(left), "right": side(right)},
-                       "equalizer#1": build_ieq(params),
                        "multiband_compressor#0": build_regulator(params),
                        "limiter#0": limiter}}
-
-
-def build_ieq(params):
-    """Approximate Dolby's intelligent EQ with a static equalizer.
-
-    Layout: [n, n, f0..f19, n, target0..target19] in 1/16 dB. The real IEQ is dynamic: it
-    pushes the music's spectrum towards this target. Here the target is centred on 0 dB
-    (so loudness is unchanged when toggling it) and scaled by the IEQ amount (param 12,
-    read as 0-16; this reading is a guess).
-    """
-    ieq = params[IEQ_TARGET]
-    n = ieq[0]
-    freqs = ieq[2:2 + n]
-    target = [t / 16 for t in ieq[3 + n:3 + 2 * n]]
-    mean = sum(target) / n
-    amount = params.get(IEQ_AMOUNT, 10) / 16
-    bands = {f"band{i}": {"frequency": float(freqs[i]), "gain": round((target[i] - mean) * amount, 2),
-                          "mode": "RLC (BT)", "mute": False, "q": bell_q(freqs, i),
-                          "slope": "x1", "solo": False, "type": "Bell"} for i in range(n)}
-    return {"bypass": False, "input-gain": 0.0, "output-gain": 0.0, "mode": "IIR",
-            "num-bands": n, "split-channels": False, "left": bands, "right": dict(bands)}
 
 
 def build_regulator(params):

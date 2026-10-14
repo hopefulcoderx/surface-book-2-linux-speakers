@@ -45,11 +45,7 @@ It stops the small speakers distorting at high volume. The strictest band is 280
 | 1.5–2 kHz | −10 dB | −10 dB |
 | > 2 kHz | — | not regulated |
 
-Then Dolby's **intelligent EQ** (parameter 13) target curve, as a static EQ scaled to the IEQ amount
-(10/16) and centred on 0 dB: about +4 dB at 2–4.5 kHz for clearer voices, rolling off above 10 kHz.
-On Windows the IEQ is dynamic, so this is an approximation.
-
-Chain: 20-band split-channel equalizer → 20-band IEQ equalizer → multiband compressor (ratio 4:1, 5 ms attack, 120 ms release) → limiter at −1 dB.
+Chain: 20-band split-channel equalizer → multiband compressor (ratio 4:1, 5 ms attack, 120 ms release) → limiter at −1 dB.
 
 ## Where the tuning comes from
 
@@ -89,7 +85,10 @@ Use `--subsys XXXX` if your model reports a different id.
   `install.sh` adds an XDG autostart entry instead.
 - **Regulator is approximate:** on Windows it reacts to the system volume; here it reacts to the music's level
   (the volume slider acts after EasyEffects). Tested clean at 100% volume.
-- **Not reproduced:** Dolby's adaptive Intelligent Equalizer (parameter 13).
+- **Intelligent EQ left out on purpose:** the IEQ target curve (parameter 13) is identical in all 24
+  presets in the INF (every device, speaker and headphone), so it is Dolby's generic default, not SB2 tuning.
+  Parameter 14, which looks like its enable flag, is 0 for the SB2 speakers. It is also dynamic on Windows,
+  and as a static EQ (+4 dB at 2–4.5 kHz) it made the speakers sound harsh, so it was removed.
 - No Microsoft or Dolby files are redistributed here. Only the derived EQ values are included.
 
 ## License
